@@ -14,31 +14,31 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # needed for some security tools
+        fetch-depth: 0
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
 
-    - name: Install dependencies and build Juice Shop
-      run: npm install && npm run build # Or use Docker build
+    - name: Install dependencies (npm install runs audit automatically)
+      run: npm install
 
     # --- Deployment Phase (Ephemeral local deployment for DAST) ---
-    # Alternatively, you would deploy to a cloud provider here (e.g., Azure/k8s-deploy)
     - name: Start OWASP Juice Shop locally
-      run: npm start & && sleep 15
-      # Give the application some time to start up
-      
+      # Use a multi-line script to run the server in the background and wait
+      run: |
+        npm start &
+        sleep 15
+      env:
+        # Optional: Set NODE_ENV to production if needed for specific behavior
+        NODE_ENV: production 
 
     # --- DAST Phase (Using OWASP ZAP) ---
     - name: Run OWASP ZAP Baseline Scan
       uses: zaproxy/action-baseline@v0.14.0
       with:
-        target: 'http://localhost:3000' # The local running instance
-        # Optional: set a failure threshold (e.g., FAIL ON WARNINGS)
-        # rules_file: '.zap/baseline_rules.conf' 
-        # issues_as_build_failure: true 
+        target: 'http://localhost:3000'
 
     # You can also use the ZAP Full Scan action for a more in-depth DAST
     # - name: Run OWASP ZAP Full Scan
