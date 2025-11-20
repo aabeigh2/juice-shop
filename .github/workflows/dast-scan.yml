@@ -26,9 +26,9 @@ jobs:
     # --- Deployment Phase (Ephemeral local deployment for DAST) ---
     # Alternatively, you would deploy to a cloud provider here (e.g., Azure/k8s-deploy)
     - name: Start OWASP Juice Shop locally
-      run: npm start &
+      run: npm start & && sleep 15
       # Give the application some time to start up
-      run: sleep 15 
+      
 
     # --- DAST Phase (Using OWASP ZAP) ---
     - name: Run OWASP ZAP Baseline Scan
